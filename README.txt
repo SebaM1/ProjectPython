@@ -73,5 +73,21 @@ numpy
 seaborn
 -e .
 
-## In terminal ##
+##### In terminal #######
 pip install -r requirements.txt
+(se crea carpta mlproject.egg-info)
+
+##### Create src folder #####
+##  inside we create the folders=
+        'Components'
+        (data_ingestion, data_transformation, 
+        model_trainer and __init__) 
+    
+        'pipeline'
+        (predict_pipeline, train_pipeline
+        and __init__)
+    
+    
+    and 4 .py files 
+    'exception.py', 'logger.py', 'utils.py'
+    and '__init__.py'
