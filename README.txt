@@ -20,8 +20,10 @@
     git push -u origin main
 
 ## Para actualizar mi Git ## 
+    git init
     git add .
-    git pull origin main
+    git commit -m "Agregando todos los archivos del proyecto"
+    git push origin main
     git push -u origin main
 
 
