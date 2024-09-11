@@ -1,0 +1,113 @@
+Con todos estos códigos que has implementado, básicamente has creado un proceso de **entrenamiento y evaluación de modelos de regresión** para un conjunto de datos. Te explico paso a paso qué es lo que hiciste:
+
+### 1. **Preprocesamiento de los Datos**
+```python
+num_features = X.select_dtypes(exclude="object").columns
+cat_features = X.select_dtypes(include="object").columns
+
+numeric_transformer = StandardScaler()
+oh_transformer = OneHotEncoder()
+
+preprocessor = ColumnTransformer(
+    [
+        ("OneHotEncoder", oh_transformer, cat_features),
+        ("StandardScaler", numeric_transformer, num_features),        
+    ]
+)
+X = preprocessor.fit_transform(X)
+```
+    **Lo que hiciste:**
+    - **Separaste las características** de los datos en variables numéricas (`num_features`) y categóricas (`cat_features`).
+    - Aplicaste **escalado estandarizado** a las características numéricas usando `StandardScaler()` y **codificación One-Hot** a las variables categóricas usando `OneHotEncoder()`.
+    - Transformaste los datos en una forma adecuada para que puedan ser usados en los modelos de machine learning.
+
+
+
+
+
+### 2. **Separación del Conjunto de Datos en Entrenamiento y Prueba**
+```python
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+```
+    **Lo que hiciste:**
+    - Dividiste tu conjunto de datos en un **80% de datos para entrenamiento** y **20% de datos para pruebas**. Esto permite entrenar los modelos en un conjunto de datos y luego evaluarlos en un conjunto diferente para verificar su capacidad de generalización.
+
+
+
+### 3. **Evaluación del Modelo**
+```python
+def evaluate_model(true, predicted):
+    mae = mean_absolute_error(true, predicted)
+    mse = mean_squared_error(true, predicted)
+    rmse = np.sqrt(mean_squared_error(true, predicted))
+    r2_square = r2_score(true, predicted)
+    return mae, rmse, r2_square
+```
+    **Lo que hiciste:**
+    - Creaste una función `evaluate_model` que toma los valores verdaderos (`true`) y predichos (`predicted`) para calcular tres métricas de evaluación:
+      - **MAE** (Error Absoluto Medio)
+      - **RMSE** (Raíz del Error Cuadrático Medio)
+      - **R2 Score** (Coeficiente de determinación \(R^2\)) para medir la precisión del modelo.
+
+
+
+
+### 4. **Entrenamiento y Evaluación de Varios Modelos**
+```python
+models = {
+    "Linear Regression": LinearRegression(),
+    "Lasso": Lasso(),
+    "Ridge": Ridge(),
+    "K-Neighbors Regressor": KNeighborsRegressor(),
+    "Decision Tree": DecisionTreeRegressor(),
+    "Random Forest Regressor": RandomForestRegressor(),
+    "XGBRegressor": XGBRegressor(), 
+    "CatBoosting Regressor": CatBoostRegressor(verbose=False),
+    "AdaBoost Regressor": AdaBoostRegressor()
+}
+
+for i in range(len(list(models))):
+    model = list(models.values())[i]
+    model.fit(X_train, y_train)  # Entrenamiento del modelo
+    y_train_pred = model.predict(X_train)
+    y_test_pred = model.predict(X_test)
+    model_train_mae , model_train_rmse, model_train_r2 = evaluate_model(y_train, y_train_pred)
+    model_test_mae , model_test_rmse, model_test_r2 = evaluate_model(y_test, y_test_pred)
+    
+    print(list(models.keys())[i])
+    print('Model performance for Training set')
+    print("- Root Mean Squared Error: {:.4f}".format(model_train_rmse))
+    print("- Mean Absolute Error: {:.4f}".format(model_train_mae))
+    print("- R2 Score: {:.4f}".format(model_train_r2))
+
+    print('----------------------------------')
+    print('Model performance for Test set')
+    print("- Root Mean Squared Error: {:.4f}".format(model_test_rmse))
+    print("- Mean Absolute Error: {:.4f}".format(model_test_mae))
+    print("- R2 Score: {:.4f}".format(model_test_r2))
+```
+    **Lo que hiciste:**
+    - Definiste un **diccionario de modelos** con varios algoritmos de regresión populares (Linear Regression, Lasso, Ridge, Decision Trees, Random Forest, etc.).
+    - Entrenaste y evaluaste cada modelo en los datos de entrenamiento (`X_train`, `y_train`) y prueba (`X_test`, `y_test`).
+    - Para cada modelo, calculaste las métricas de rendimiento (MAE, RMSE y \(R^2\)) tanto para los conjuntos de entrenamiento como de prueba.
+
+
+
+
+### 5. **Comparación de Modelos Usando \(R^2\)**
+```python
+pd.DataFrame(list(zip(model_list, r2_list)), columns=['Model Name', 'R2_Score']).sort_values(by=["R2_Score"], ascending=False)
+```
+    **Lo que hiciste:**
+    - Guardaste los nombres de los modelos y sus respectivos puntajes \(R^2\) en una lista.
+    - Luego creaste un DataFrame de **Pandas** que muestra el nombre del modelo y su \(R^2\), ordenando los modelos de mayor a menor rendimiento en función de su puntaje \(R^2\).
+    - Esto te permite **comparar el rendimiento de todos los modelos** y ver cuál tiene el mejor ajuste en el conjunto de prueba.
+
+### **Resumen General**
+1. **Preprocesaste los datos** aplicando técnicas adecuadas para variables numéricas y categóricas.
+2. **Dividiste los datos** en conjuntos de entrenamiento y prueba.
+3. **Definiste varios modelos de regresión** y los entrenaste en los datos.
+4. **Evaluaste el rendimiento** de los modelos utilizando métricas de error y precisión.
+5. **Comparaste el rendimiento** de los modelos en base a \(R^2\) para identificar el mejor modelo.
+
+Este proceso es común en **Machine Learning** cuando se trata de encontrar el mejor modelo para realizar predicciones en un problema de regresión.
